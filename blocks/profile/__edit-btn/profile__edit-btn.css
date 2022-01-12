@@ -1,0 +1,22 @@
+.profile__edit-btn {
+  width: 24px;
+  height: 24px;
+  background-image: url(../../../images/edit-button.svg);
+}
+
+@media screen and (max-width: 1000px) {
+  .profile__edit-btn {
+    position: absolute;
+    bottom: 46px;
+    right: 30px;
+  }
+}
+
+@media screen and (max-width: 650px) {
+  .profile__edit-btn {
+    width: 18px;
+    height: 18px;
+    bottom: 36px;
+    right: 19px;
+  }
+}
