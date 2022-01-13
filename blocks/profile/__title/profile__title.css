@@ -6,7 +6,13 @@
   font-size: 42px;
   line-height: 48px;
   color: #fff;
-  margin: 0 auto;
+  margin: 0;
+}
+
+@media screen and (max-width: 1000px) {
+  .profile__title {
+    margin: 0 auto;
+  }
 }
 
 @media screen and (max-width: 650px) {
