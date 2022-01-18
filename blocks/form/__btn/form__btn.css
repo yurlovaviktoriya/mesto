@@ -13,6 +13,7 @@
   line-height: 22px;
   text-align: center;
   color: #fff;
+  border-radius: 2px;
 }
 
 .form__btn:hover {
