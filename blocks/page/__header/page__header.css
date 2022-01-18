@@ -4,14 +4,14 @@
 }
 
 @media screen and (max-width: 1000px) {
-  .header {
+  .page__header {
     margin-left: calc((100% - 581px)/2);
     margin-right: calc((100% - 581px)/2);
   }
 }
 
 @media screen and (max-width: 650px) {
-  .header {
+  .page__header {
     margin: 0;
   }
 }
