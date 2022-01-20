@@ -1,9 +1,8 @@
 .profile__info {
   display: flex;
-  justify-content: space-between;
   align-items: baseline;
   flex-wrap: wrap;
-  width: 336px;
+  width: 530px;
   margin-top: 22px;
   margin-bottom: 25px;
   margin-left: 30px;
@@ -11,16 +10,15 @@
 
 @media screen and (max-width: 1000px) {
   .profile__info {
-    width: 450px;
     display: block;
-    text-align: center;
-    margin: 22.5px 0 0;
+    max-width: 581px;
+    margin: 26px auto 0;
     position: relative;
   }
 }
 
 @media screen and (max-width: 650px) {
   .profile__info {
-    width: 282px;
+    max-width: 282px;
   }
 }
