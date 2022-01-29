@@ -1,0 +1,4 @@
+.popup__place-img {
+  /* width: 100%; */
+  object-fit: cover;
+}
