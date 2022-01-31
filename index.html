@@ -25,7 +25,7 @@
       </section>
 
       <section class="places page__places">
-        <template id="templatePlaceCard">
+        <template class="template template__place-card">
           <article class="card">
             <img class="card__img" src="./images/" alt="Изображение места">
             <div class="card__info">
@@ -41,36 +41,36 @@
       <p class="footer__copyright">&copy; 2020 Mesto Russia</p>
     </footer>
   </div>
-  <div class="popup" id="popupEditProfile">
+  <div class="popup popup_type_edit-profile">
     <div class="popup__form-container">
-      <form class="form" id="formEditProfile" name="formEditProfile">
+      <form class="form" name="formEditProfile">
         <h2 class="form__title">Редактировать профиль</h2>
-        <input class="form__input" type="text" id="formNameProfile" name="nameProfile" required placeholder="Введите имя">
-        <input class="form__input" type="text" id="formJobProfile" name="jobProfile" required placeholder="Расскажите про область интересов">
+        <input class="form__input form__input_type_name-profile" type="text" name="nameProfile" required placeholder="Введите имя">
+        <input class="form__input form__input_type_job-profile" type="text" name="jobProfile" required placeholder="Расскажите про область интересов">
         <button class="form__btn" type="submit">Сохранить</button>
       </form>
       <button class="popup__btn-close" type="button" aria-label="Закрыть форму редактирования профиля"></button>
     </div>
   </div>
-  <div class="popup" id="popupAddPlace">
+  <div class="popup popup_type_add-place">
     <div class="popup__form-container">
-      <form class="form" id="formAddPlace" name="formAddPlace">
+      <form class="form" name="formAddPlace">
         <h2 class="form__title">Новое место</h2>
-        <input class="form__input" type="text" id="formNamePlace" name="namePlace" required placeholder="Название">
-        <input class="form__input" type="url" id="formUrlImgPlace" name="urlPlaceImg" required placeholder="Ссылка на картинку">
+        <input class="form__input form__input_type_title-place" type="text" name="namePlace" required placeholder="Название">
+        <input class="form__input form__input_type_url-img" type="url" name="urlPlaceImg" required placeholder="Ссылка на картинку">
         <button class="form__btn" type="submit">Создать</button>
       </form>
       <button class="popup__btn-close" type="button" aria-label="Закрыть форму добавления места"></button>
     </div>
   </div>
-  <div class="popup popup_type_view-place" id="popupViewPlace">
+  <div class="popup popup_type_view-place">
     <div class="popup__place-container">
       <img class="popup__place-img" src="./images/" alt="">
       <h3 class="popup__place-title"></h3>
       <button class="popup__btn-close" type="button" aria-label="Закрыть изображение места"></button>
     </div>
   </div>
-<script src="./scripts/initial-data.js"></script>
+<script src="./scripts/initialData.js"></script>
 <script src="./scripts/index.js"></script>
 </body>
 </html>
