@@ -25,58 +25,25 @@
       </section>
 
       <section class="places page__places">
-        <article class="card">
-          <img class="card__img" src="./images/karachaevsk.jpg" alt="Сентинский храм в Карачаевске">
+        <template id="templatePlaceCard">
+          <article class="card">
+            <img class="card__img" src="" alt="Изображение места">
             <div class="card__info">
-              <h2 class="card__title">Карачаевск</h2>
+              <h2 class="card__title"></h2>
               <button class="card__btn-like" type="button" aria-label="Поставить лайк"></button>
             </div>
-          <button class="card__btn-del" type="button" aria-label="Удалить карточку с местом"></button>
-        </article>
-        <article class="card">
-          <img class="card__img" src="./images/elbrus.jpg" alt="Вид на гору Эльбрус">
-            <div class="card__info">
-              <h2 class="card__title">Гора Эльбрус</h2>
-              <button class="card__btn" type="button" aria-label="Поставить лайк"></button>
-            </div>
-        </article>
-        <article class="card">
-          <img class="card__img" src="./images/dombay.png" alt="Горная территория Домбай">
-            <div class="card__info">
-              <h2 class="card__title">Домбай</h2>
-              <button class="card__btn" type="button" aria-label="Поставить лайк"></button>
-            </div>
-        </article>
-        <article class="card">
-          <img class="card__img" src="./images/elbrus.jpg" alt="Вид на гору Эльбрус">
-            <div class="card__info">
-              <h2 class="card__title">Гора Эльбрус</h2>
-              <button class="card__btn" type="button" aria-label="Поставить лайк"></button>
-            </div>
-        </article>
-        <article class="card">
-          <img class="card__img" src="./images/dombay.png" alt="Горная территория Домбай">
-            <div class="card__info">
-              <h2 class="card__title">Домбай</h2>
-              <button class="card__btn" type="button" aria-label="Поставить лайк"></button>
-            </div>
-        </article>
-        <article class="card">
-          <img class="card__img" src="./images/karachaevsk.jpg" alt="Сентинский храм в Карачаевске">
-            <div class="card__info">
-              <h2 class="card__title">Карачаево-Черкесия</h2>
-              <button class="card__btn" type="button" aria-label="Поставить лайк"></button>
-            </div>
-        </article>
+            <button class="card__btn-del" type="button" aria-label="Удалить карточку с местом"></button>
+          </article>
+        </template>
       </section>
     </main>
     <footer class="footer page__footer">
       <p class="footer__copyright">&copy; 2020 Mesto Russia</p>
     </footer>
   </div>
-  <div class="popup">
+  <div class="popup" id="popupEditProfile">
     <div class="popup__form-container">
-      <form class="form" name="form-edit-profile">
+      <form class="form" id="formEditProfile" name="formEditProfile">
         <h2 class="form__title">Редактировать профиль</h2>
         <input class="form__input" type="text" id="formNameProfile" name="nameProfile" required placeholder="Введите имя">
         <input class="form__input" type="text" id="formJobProfile" name="jobProfile" required placeholder="Расскажите про область интересов">
@@ -85,24 +52,25 @@
       <button class="popup__btn-close" type="button" aria-label="Закрыть форму редактирования профиля"></button>
     </div>
   </div>
-  <div class="popup">
+  <div class="popup" id="popupAddPlace">
     <div class="popup__form-container">
-      <form class="form" name="form-add-place">
+      <form class="form" id="formAddPlace" name="formAddPlace">
         <h2 class="form__title">Новое место</h2>
         <input class="form__input" type="text" id="formNamePlace" name="namePlace" required placeholder="Название">
-        <input class="form__input" type="url" id="formUrlPlaceImg" name="urlPlaceImg" required placeholder="Ссылка на картинку">
+        <input class="form__input" type="url" id="formUrlImgPlace" name="urlPlaceImg" required placeholder="Ссылка на картинку">
         <button class="form__btn" type="submit">Создать</button>
       </form>
       <button class="popup__btn-close" type="button" aria-label="Закрыть форму добавления места"></button>
     </div>
   </div>
-  <div class="popup">
+  <div class="popup popup_type_view-place" id="popupViewPlace">
     <div class="popup__place-container">
-      <img class="popup__place-img" src="" alt="Изображение выбранного места">
+      <img class="popup__place-img" src="" alt="">
       <h3 class="popup__place-title"></h3>
       <button class="popup__btn-close" type="button" aria-label="Закрыть изображение места"></button>
     </div>
   </div>
+<script src="./scripts/initinal-data.js"></script>
 <script src="./scripts/index.js"></script>
 </body>
 </html>
