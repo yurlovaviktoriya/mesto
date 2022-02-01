@@ -98,8 +98,10 @@ function handleFormAddPlace(event) {
 
 function viewPlace(event) {
   openPopup(popupViewPlace);
+  const titlePlace = event.target.nextElementSibling.firstElementChild.textContent;
   urlImg.src = event.target.src;
-  titleImg.textContent = event.target.nextElementSibling.firstElementChild.textContent;
+  urlImg.alt = `Изображение места ${titlePlace}`;
+  titleImg.textContent = titlePlace;
 }
 
 
