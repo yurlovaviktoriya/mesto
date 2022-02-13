@@ -1,3 +1,5 @@
+const popups = document.querySelectorAll('.popup');
+
 const popupEditProfile = document.querySelector('.popup_type_edit-profile');
 const buttonProfileEdit = document.querySelector('.profile__edit-btn');
 
@@ -44,8 +46,9 @@ function addCardListeners(card) {
 function createCard(titlePlace, urlImg) {
   const card = placeElement.cloneNode(true);
   card.querySelector('.card__title').textContent = titlePlace;
-  card.querySelector('.card__img').src = urlImg;
-  card.querySelector('.card__img').alt = `Изображение места ${titlePlace}`;
+  const cardImg = card.querySelector('.card__img');
+  cardImg.src = urlImg;
+  cardImg.alt = `Изображение места ${titlePlace}`;
   addCardListeners(card);
   return card;
 }
@@ -109,9 +112,54 @@ function closePopup(popup) {
 
 
 /**
- * Функция открывает попап с формой редактирования профиля; заполняет поля ввода актуальными сведениями
+ * Функция активирует кнопку отправки формы
+ * @param {object} form -Объект формы
+ */
+function enableButtonSubmit(form) {
+  const buttonSubmit = form.querySelector('.form__btn');
+  buttonSubmit.disabled = '';
+  buttonSubmit.classList.remove('form__btn_disabled');
+}
+
+
+/**
+ * Функция удаляет классы, стилизующие ошибки полей ввода, и текст ошибки
+ * @param {object} form - Объект формы
+ * @param {object} input - Объект поля формы
+ */
+function deleteInputError(form, input) {
+  input.classList.remove('form__input_type_error');
+  const errorMessage = form.querySelector(`.${input.id}-error`);
+  errorMessage.classList.remove('form__error_visible');
+  errorMessage.textContent = '';
+}
+
+
+/**
+ * Функция проверяет стилизуются ли поля формы как ошибочные;
+ * при true вызывает функцию удаления ошибок из полей формы и функцию активации кнопки отправки формы
+ * @param {object} form - Объект формы
+ * @param {NodeList} inputs - Все поля формы
+ */
+function checkInputError(form, inputs) {
+  inputs.forEach((input) => {
+    if (input.classList.contains('form__input_type_error')) {
+      deleteInputError(form, input);
+      enableButtonSubmit(form);
+    }
+  })
+}
+
+
+/**
+ * Функция открывает попап с формой редактирования профиля;
+ * вызывает функцию проверки стилизации полей ввода как ошибочных;
+ * заполняет поля ввода актуальными сведениями
  */
 function openFormEditProfile() {
+  const form = popupEditProfile.querySelector('.form')
+  const inputs = form.querySelectorAll('.form__input');
+  checkInputError(form, inputs);
   openPopup(popupEditProfile);
   formNameProfile.value = nameProfile.textContent;
   formJobProfile.value = jobProfile.textContent;
@@ -129,8 +177,6 @@ function handleFormEditProfile(event) {
   nameProfile.textContent = nameInput;
   jobProfile.textContent = jobInput;
   closePopup(popupEditProfile);
-  formNameProfile.value = '';
-  formJobProfile.value = '';
 }
 
 
@@ -155,6 +201,9 @@ function handleFormAddPlace(event) {
   closePopup(popupAddPlace);
   formNamePlace.value = '';
   formUrlImgPlace.value = '';
+  const buttonSubmit = event.target.querySelector('.form__btn');
+  buttonSubmit.classList.add('form__btn_disabled');
+  buttonSubmit.disabled = 'disabled';
 }
 
 
@@ -189,25 +238,24 @@ function deletePlace(event) {
 }
 
 
-/**
- * Функция проверяет элемент события;
- * если это клик по кнопке закрытия попапа или оверлею, вызывает функцию закрытия попапа
- * @param {object} event - Объект события
- */
-function checkClosePopupButtonOrOverlay(event) {
-  const popup = document.querySelector('.popup_opened');
-  if (event.target.classList.contains('popup__btn-close') || event.target === popup) {
-    closePopup(popup);
-  }
-}
-
-
 buttonProfileEdit.addEventListener('click', openFormEditProfile);
 formEditProfile.addEventListener('submit', handleFormEditProfile);
-popupEditProfile.addEventListener('click', checkClosePopupButtonOrOverlay);
 
 buttonPlaceAdd.addEventListener('click', openFormAddPlace);
 formAddPlace.addEventListener('submit', handleFormAddPlace);
-popupAddPlace.addEventListener('click', checkClosePopupButtonOrOverlay);
 
-popupViewPlace.addEventListener('click', checkClosePopupButtonOrOverlay);
+/**
+ * Добавляет слушатели всем попапам на событие нажатия мыши;
+ * если событие сработало на кнопке закрытия попапа или оверлее, вызывает функцию закрытия попапа
+ */
+popups.forEach((popup) => {
+  popup.addEventListener('mousedown', (evt) => {
+    if (evt.target.classList.contains('popup_opened')) {
+      closePopup(popup)
+    }
+    if (evt.target.classList.contains('popup__btn-close')) {
+      closePopup(popup)
+    }
+  })
+})
+
