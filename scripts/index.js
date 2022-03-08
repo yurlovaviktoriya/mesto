@@ -1,3 +1,7 @@
+import Card from './Card.js';
+import FormValidator from './FormValidator.js';
+import {initialCards} from './initialData.js';
+
 const popups = document.querySelectorAll('.popup');
 
 const popupEditProfile = document.querySelector('.popup_type_edit-profile');
@@ -5,10 +9,6 @@ const buttonProfileEdit = document.querySelector('.profile__edit-btn');
 
 const popupAddPlace = document.querySelector('.popup_type_add-place');
 const buttonPlaceAdd = document.querySelector('.profile__add-btn');
-
-const popupViewPlace = document.querySelector('.popup_type_view-place');
-const urlImg = popupViewPlace.querySelector('.popup__place-img');
-const titleImg = popupViewPlace.querySelector('.popup__place-title');
 
 const nameProfile = document.querySelector('.profile__title');
 const jobProfile = document.querySelector('.profile__subtitle');
@@ -22,44 +22,32 @@ const formNamePlace = popupAddPlace.querySelector('#input-place-name');
 const formUrlImgPlace = popupAddPlace.querySelector('#input-place-url-img');
 
 const placeSection = document.querySelector('.places');
-const placeTemplate = document.querySelector('.template__place-card').content;
-const placeElement = placeTemplate.querySelector('.card');
 
-
-/**
- * Функция добавляет слушатели на карточку места для лайка, удаления и просмотра изображения
- * @param {object} card - Объект созданной карточки
- */
-function addCardListeners(card) {
-  card.querySelector('.card__btn-like').addEventListener('click', likePlace);
-  card.querySelector('.card__btn-del').addEventListener('click', deletePlace);
-  card.querySelector('.card__img').addEventListener('click', viewPlace);
+const forms = document.forms;
+const settings = {
+  inputSelector: '.form__input',
+  submitButtonSelector: '.form__btn',
+  inactiveButtonClass: 'form__btn_disabled',
+  inputErrorClass: 'form__input_type_error',
+  errorClass: 'form__error_visible'
 }
 
 
 /**
- * Функция создаёт объект карточки места для дальнейшего добавления в DOM
- * @param {string} titlePlace - Наименование места
- * @param {string} urlImg - Ссылка на картинку места
- * @returns {Node} - Объект карточки
+ * Создаёт экземпляры валидаторов для всех форм на странице
  */
-function createCard(titlePlace, urlImg) {
-  const card = placeElement.cloneNode(true);
-  card.querySelector('.card__title').textContent = titlePlace;
-  const cardImg = card.querySelector('.card__img');
-  cardImg.src = urlImg;
-  cardImg.alt = `Изображение места ${titlePlace}`;
-  addCardListeners(card);
-  return card;
-}
+Array.from(forms).forEach((form) => {
+  const formValidator = new FormValidator(settings, form);
+  formValidator.enableValidation();
+});
 
 
 /**
  * Добавляет карточки в DOM-дерево при загрузке страницы
  */
 initialCards.forEach((placeItem) => {
-  const card = createCard(placeItem.name, placeItem.link);
-  placeSection.prepend(card);
+  const card = new Card(placeItem.name, placeItem.link, '.template__place-card');
+  placeSection.prepend(card.generateCard());
 });
 
 
@@ -196,45 +184,14 @@ function handleFormAddPlace(event) {
   event.preventDefault();
   const namePlaceInput = formNamePlace.value;
   const urlPlaceInput = formUrlImgPlace.value;
-  const card = createCard(namePlaceInput, urlPlaceInput);
-  placeSection.prepend(card);
+  const card = new Card(namePlaceInput, urlPlaceInput, '.template__place-card');
+  placeSection.prepend(card.generateCard());
   closePopup(popupAddPlace);
   formNamePlace.value = '';
   formUrlImgPlace.value = '';
   const buttonSubmit = event.target.querySelector('.form__btn');
   buttonSubmit.classList.add('form__btn_disabled');
   buttonSubmit.disabled = 'disabled';
-}
-
-
-/**
- * Функция открывает попап просмотра изображения места
- * @param {object} event - Объект события
- */
-function viewPlace(event) {
-  openPopup(popupViewPlace);
-  const titlePlace = event.target.nextElementSibling.firstElementChild.textContent;
-  urlImg.src = event.target.src;
-  urlImg.alt = `Изображение места ${titlePlace}`;
-  titleImg.textContent = titlePlace;
-}
-
-
-/**
- * Функция добавляет лайк карточке места
- * @param {object} event - Объект события
- */
-function likePlace(event) {
-  event.target.classList.toggle('card__btn-like_active');
-}
-
-
-/**
- * Функция удаляет карточку места
- * @param {object} event - Объект события
- */
-function deletePlace(event) {
-  event.target.closest('.card').remove();
 }
 
 
@@ -259,3 +216,4 @@ popups.forEach((popup) => {
   })
 })
 
+export {openPopup};
