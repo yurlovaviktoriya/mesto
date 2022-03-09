@@ -46,7 +46,7 @@ Array.from(forms).forEach((form) => {
  * Добавляет карточки в DOM-дерево при загрузке страницы
  */
 initialCards.forEach((placeItem) => {
-  const card = new Card(placeItem.name, placeItem.link, '.template__place-card');
+  const card = new Card(placeItem, '.template__place-card', handleCardClick);
   placeSection.prepend(card.generateCard());
 });
 
@@ -182,9 +182,10 @@ function openFormAddPlace() {
  */
 function handleFormAddPlace(event) {
   event.preventDefault();
-  const namePlaceInput = formNamePlace.value;
-  const urlPlaceInput = formUrlImgPlace.value;
-  const card = new Card(namePlaceInput, urlPlaceInput, '.template__place-card');
+  const place = {name: formNamePlace.value, link: formUrlImgPlace.value}
+  // const namePlaceInput = formNamePlace.value;
+  // const urlPlaceInput = formUrlImgPlace.value;
+  const card = new Card(place, '.template__place-card', handleCardClick);
   placeSection.prepend(card.generateCard());
   closePopup(popupAddPlace);
   formNamePlace.value = '';
@@ -216,4 +217,17 @@ popups.forEach((popup) => {
   })
 })
 
-export {openPopup};
+// export {openPopup};
+
+
+const popupViewPlace = document.querySelector('.popup_type_view-place');
+const imgUri = popupViewPlace.querySelector('.popup__place-img');
+const titleImg = popupViewPlace.querySelector('.popup__place-title');
+
+
+function handleCardClick(name, link) {
+  imgUri.src = link;
+  imgUri.alt = `Изображение места ${name}`;
+  titleImg.textContent = name;
+  openPopup(popupViewPlace);
+}
