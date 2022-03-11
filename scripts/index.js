@@ -2,6 +2,7 @@ import Card from './Card.js';
 import FormValidator from './FormValidator.js';
 import {initialCards} from './initialData.js';
 
+
 const popups = document.querySelectorAll('.popup');
 
 const popupEditProfile = document.querySelector('.popup_type_edit-profile');
@@ -9,6 +10,10 @@ const buttonProfileEdit = document.querySelector('.profile__edit-btn');
 
 const popupAddPlace = document.querySelector('.popup_type_add-place');
 const buttonPlaceAdd = document.querySelector('.profile__add-btn');
+
+const popupViewPlace = document.querySelector('.popup_type_view-place');
+const imgUri = popupViewPlace.querySelector('.popup__place-img');
+const titleImg = popupViewPlace.querySelector('.popup__place-title');
 
 const nameProfile = document.querySelector('.profile__title');
 const jobProfile = document.querySelector('.profile__subtitle');
@@ -23,8 +28,9 @@ const formUrlImgPlace = popupAddPlace.querySelector('#input-place-url-img');
 
 const placeSection = document.querySelector('.places');
 
-const forms = document.forms;
+
 const settings = {
+  formSelector: '.form',
   inputSelector: '.form__input',
   submitButtonSelector: '.form__btn',
   inactiveButtonClass: 'form__btn_disabled',
@@ -32,21 +38,41 @@ const settings = {
   errorClass: 'form__error_visible'
 }
 
+const formValidators = {};
+
 
 /**
- * Создаёт экземпляры валидаторов для всех форм на странице
+ * Функция создаёт экземпляры валидаторов всех форм, добавляет их в один объект и запускает валидацию каждой формы
+ * @param {object} settings - Объект с именами классов и селекторов
  */
-Array.from(forms).forEach((form) => {
-  const formValidator = new FormValidator(settings, form);
-  formValidator.enableValidation();
-});
+const enableValidation = (settings) => {
+  const formList = Array.from(document.querySelectorAll(settings.formSelector));
+
+  formList.forEach((formElement) => {
+    const formValidator = new FormValidator(settings, formElement);
+    const formName = formElement.getAttribute('name');
+
+    formValidators[formName] = formValidator;
+    formValidator.enableValidation();
+  })
+};
+
+
+/**
+ * Функция создаёт экземпляр карточки места
+ * @param {object} placeItem - Объект с названием места и ссылкой на изображение
+ * @returns {*} - Экземпляр карточки места
+ */
+function createCard(placeItem) {
+  return new Card(placeItem, '.template__place-card', handleCardClick);
+}
 
 
 /**
  * Добавляет карточки в DOM-дерево при загрузке страницы
  */
 initialCards.forEach((placeItem) => {
-  const card = new Card(placeItem, '.template__place-card', handleCardClick);
+  const card = createCard(placeItem);
   placeSection.prepend(card.generateCard());
 });
 
@@ -100,57 +126,17 @@ function closePopup(popup) {
 
 
 /**
- * Функция активирует кнопку отправки формы
- * @param {object} form -Объект формы
- */
-function enableButtonSubmit(form) {
-  const buttonSubmit = form.querySelector('.form__btn');
-  buttonSubmit.disabled = '';
-  buttonSubmit.classList.remove('form__btn_disabled');
-}
-
-
-/**
- * Функция удаляет классы, стилизующие ошибки полей ввода, и текст ошибки
- * @param {object} form - Объект формы
- * @param {object} input - Объект поля формы
- */
-function deleteInputError(form, input) {
-  input.classList.remove('form__input_type_error');
-  const errorMessage = form.querySelector(`.${input.id}-error`);
-  errorMessage.classList.remove('form__error_visible');
-  errorMessage.textContent = '';
-}
-
-
-/**
- * Функция проверяет стилизуются ли поля формы как ошибочные;
- * при true вызывает функцию удаления ошибок из полей формы и функцию активации кнопки отправки формы
- * @param {object} form - Объект формы
- * @param {NodeList} inputs - Все поля формы
- */
-function checkInputError(form, inputs) {
-  inputs.forEach((input) => {
-    if (input.classList.contains('form__input_type_error')) {
-      deleteInputError(form, input);
-      enableButtonSubmit(form);
-    }
-  })
-}
-
-
-/**
  * Функция открывает попап с формой редактирования профиля;
- * вызывает функцию проверки стилизации полей ввода как ошибочных;
- * заполняет поля ввода актуальными сведениями
+ * очищает поля формы от несохранённых данных,
+ * заполняет поля ввода актуальными сведениями,
+ * деактивирует кнопку сабмита
  */
 function openFormEditProfile() {
-  const form = popupEditProfile.querySelector('.form')
-  const inputs = form.querySelectorAll('.form__input');
-  checkInputError(form, inputs);
-  openPopup(popupEditProfile);
+  formEditProfile.reset();
+  formValidators[formEditProfile.getAttribute('name')].resetValidation();
   formNameProfile.value = nameProfile.textContent;
   formJobProfile.value = jobProfile.textContent;
+  openPopup(popupEditProfile);
 }
 
 
@@ -172,6 +158,7 @@ function handleFormEditProfile(event) {
  * Функция открывает попап с формой добавления нового места
  */
 function openFormAddPlace() {
+  formValidators[formAddPlace.getAttribute('name')].resetValidation();
   openPopup(popupAddPlace);
 }
 
@@ -183,16 +170,23 @@ function openFormAddPlace() {
 function handleFormAddPlace(event) {
   event.preventDefault();
   const place = {name: formNamePlace.value, link: formUrlImgPlace.value}
-  // const namePlaceInput = formNamePlace.value;
-  // const urlPlaceInput = formUrlImgPlace.value;
-  const card = new Card(place, '.template__place-card', handleCardClick);
+  const card = createCard(place);
   placeSection.prepend(card.generateCard());
   closePopup(popupAddPlace);
-  formNamePlace.value = '';
-  formUrlImgPlace.value = '';
-  const buttonSubmit = event.target.querySelector('.form__btn');
-  buttonSubmit.classList.add('form__btn_disabled');
-  buttonSubmit.disabled = 'disabled';
+  formAddPlace.reset();
+}
+
+
+/**
+ * Функция обрабатывает 'click' по изображению карточки места
+ * @param {string} name - Название места
+ * @param {string} link - Ссылка на изображение места
+ */
+function handleCardClick(name, link) {
+  imgUri.src = link;
+  imgUri.alt = `Изображение места ${name}`;
+  titleImg.textContent = name;
+  openPopup(popupViewPlace);
 }
 
 
@@ -201,6 +195,7 @@ formEditProfile.addEventListener('submit', handleFormEditProfile);
 
 buttonPlaceAdd.addEventListener('click', openFormAddPlace);
 formAddPlace.addEventListener('submit', handleFormAddPlace);
+
 
 /**
  * Добавляет слушатели всем попапам на событие нажатия мыши;
@@ -217,17 +212,5 @@ popups.forEach((popup) => {
   })
 })
 
-// export {openPopup};
 
-
-const popupViewPlace = document.querySelector('.popup_type_view-place');
-const imgUri = popupViewPlace.querySelector('.popup__place-img');
-const titleImg = popupViewPlace.querySelector('.popup__place-title');
-
-
-function handleCardClick(name, link) {
-  imgUri.src = link;
-  imgUri.alt = `Изображение места ${name}`;
-  titleImg.textContent = name;
-  openPopup(popupViewPlace);
-}
+enableValidation(settings);
