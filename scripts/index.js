@@ -1,33 +1,19 @@
+import UserInfo from './UserInfo.js';
+import Section from './Section.js';
 import Card from './Card.js';
+import PopupWithForm from './PopupWithForm.js';
+import PopupWithImage from './PopupWithImage.js';
 import FormValidator from './FormValidator.js';
 import {initialCards} from './initialData.js';
 
 
-const popups = document.querySelectorAll('.popup');
-
-const popupEditProfile = document.querySelector('.popup_type_edit-profile');
 const buttonProfileEdit = document.querySelector('.profile__edit-btn');
-
-const popupAddPlace = document.querySelector('.popup_type_add-place');
 const buttonPlaceAdd = document.querySelector('.profile__add-btn');
-
-const popupViewPlace = document.querySelector('.popup_type_view-place');
-const imgUri = popupViewPlace.querySelector('.popup__place-img');
-const titleImg = popupViewPlace.querySelector('.popup__place-title');
-
-const nameProfile = document.querySelector('.profile__title');
-const jobProfile = document.querySelector('.profile__subtitle');
-
-const formEditProfile = popupEditProfile.querySelector('.form');
-const formNameProfile = popupEditProfile.querySelector('#input-profile-name');
-const formJobProfile = popupEditProfile.querySelector('#input-profile-job');
-
-const formAddPlace = popupAddPlace.querySelector('.form');
-const formNamePlace = popupAddPlace.querySelector('#input-place-name');
-const formUrlImgPlace = popupAddPlace.querySelector('#input-place-url-img');
-
-const placeSection = document.querySelector('.places');
-
+const userInfo = new UserInfo({nameSelector: '.profile__title', jobSelector: '.profile__subtitle'});
+const cardSection = new Section({items: initialCards, renderer: renderCard}, '.places');
+const popupEditProfile = new PopupWithForm('.popup_type_edit-profile', handleFormEditProfile);
+const popupAddPlace = new PopupWithForm('.popup_type_add-place', handleFormAddPlace);
+const popupViewPlace = new PopupWithImage('.popup_type_view-place');
 
 const settings = {
   formSelector: '.form',
@@ -59,6 +45,16 @@ const enableValidation = (settings) => {
 
 
 /**
+ * Функция обрабатывает 'click' по изображению карточки места
+ * @param {string} name - Название места
+ * @param {string} link - Ссылка на изображение места
+ */
+function handleCardClick(name, link) {
+  popupViewPlace.open({name: name, link: link});
+}
+
+
+/**
  * Функция создаёт экземпляр карточки места
  * @param {object} placeItem - Объект с названием места и ссылкой на изображение
  * @returns {*} - Экземпляр карточки места
@@ -69,59 +65,13 @@ function createCard(placeItem) {
 
 
 /**
- * Добавляет карточки в DOM-дерево при загрузке страницы
+ * Функция создаёт экземпляры класса Card и добавляет карточки места на страницу
+ * @param {object} placeItem - Объект с названием места и ссылкой на изображение
+ * @param {object} container - DOM-элемент, в который добавляются карточки места
  */
-initialCards.forEach((placeItem) => {
+function renderCard(placeItem, container) {
   const card = createCard(placeItem);
-  placeSection.prepend(card.generateCard());
-});
-
-
-/**
- * Функция проверяет нажатие клавиши Esc; при true вызывает закрытие попапа
- * @param {object} event - Объект события
- */
-function checkEscapeEventKey(event) {
-  if (event.key === 'Escape') {
-    const popup = document.querySelector('.popup_opened');
-    closePopup(popup);
-  }
-}
-
-
-/**
- * Функция добавляет слушателя на событие клавиатуры (нажатие клавиши)
- */
-function addEscListeners() {
-  document.addEventListener('keydown', checkEscapeEventKey);
-}
-
-
-/**
- * Функция удаляет слушателя на событии клавиатуры (нажатие клавиши)
- */
-function removeEscListeners() {
-  document.removeEventListener('keydown', checkEscapeEventKey);
-}
-
-
-/**
- * Функция показывает попап и вызывает функцию добавления слушателя
- * @param {object} popup - Объект попапа
- */
-function openPopup(popup) {
-  popup.classList.add('popup_opened');
-  addEscListeners();
-}
-
-
-/**
- * Функция закрывает попап и вызывает функцию удаления слушателя
- * @param {object} popup - Объект попапа
- */
-function closePopup(popup) {
-  popup.classList.remove('popup_opened');
-  removeEscListeners();
+  container.prepend(card.generateCard());
 }
 
 
@@ -132,85 +82,58 @@ function closePopup(popup) {
  * деактивирует кнопку сабмита
  */
 function openFormEditProfile() {
-  formEditProfile.reset();
   formValidators[formEditProfile.getAttribute('name')].resetValidation();
-  formNameProfile.value = nameProfile.textContent;
-  formJobProfile.value = jobProfile.textContent;
-  openPopup(popupEditProfile);
+
+  const {name, job} = userInfo.getUserInfo();
+  popupEditProfile.popup.querySelector('#input-profile-name').value = name;
+  popupEditProfile.popup.querySelector('#input-profile-job').value = job;
+
+  popupEditProfile.open();
 }
 
 
 /**
  * Функция обрабатывает 'submit' формы редактирования профиля
- * @param {object} event - Объект события
+ * @param {object} inputValues - Объект с данными из инпутов
  */
-function handleFormEditProfile(event) {
-  event.preventDefault();
-  const nameInput = formNameProfile.value;
-  const jobInput = formJobProfile.value;
-  nameProfile.textContent = nameInput;
-  jobProfile.textContent = jobInput;
-  closePopup(popupEditProfile);
+function handleFormEditProfile(inputValues) {
+  userInfo.setUserInfo({name: inputValues['nameProfile'], job: inputValues['jobProfile']});
+
+  popupEditProfile.close();
 }
 
 
 /**
- * Функция открывает попап с формой добавления нового места
+ * Функция открывает попап с формой добавления нового места;
+ * очищает поля формы от несохранённых данных,
+ * деактивирует кнопку сабмита
  */
 function openFormAddPlace() {
   formValidators[formAddPlace.getAttribute('name')].resetValidation();
-  openPopup(popupAddPlace);
+
+  popupAddPlace.open();
 }
 
 
 /**
  * Функция обрабатывает 'submit' формы добавления нового места
- * @param {object} event - Объект события
+ * @param {object} inputValues - Объект с данными из инпутов
  */
-function handleFormAddPlace(event) {
-  event.preventDefault();
-  const place = {name: formNamePlace.value, link: formUrlImgPlace.value}
-  const card = createCard(place);
-  placeSection.prepend(card.generateCard());
-  closePopup(popupAddPlace);
-  formAddPlace.reset();
-}
+function handleFormAddPlace(inputValues) {
+  const place = {name: inputValues['namePlace'], link: inputValues['urlPlaceImg']};
+  cardSection.addItem(place);
 
-
-/**
- * Функция обрабатывает 'click' по изображению карточки места
- * @param {string} name - Название места
- * @param {string} link - Ссылка на изображение места
- */
-function handleCardClick(name, link) {
-  imgUri.src = link;
-  imgUri.alt = `Изображение места ${name}`;
-  titleImg.textContent = name;
-  openPopup(popupViewPlace);
+  popupAddPlace.close();
 }
 
 
 buttonProfileEdit.addEventListener('click', openFormEditProfile);
-formEditProfile.addEventListener('submit', handleFormEditProfile);
-
 buttonPlaceAdd.addEventListener('click', openFormAddPlace);
-formAddPlace.addEventListener('submit', handleFormAddPlace);
 
+popupAddPlace.setEventListeners();
+popupEditProfile.setEventListeners();
+popupViewPlace.setEventListeners();
 
-/**
- * Добавляет слушатели всем попапам на событие нажатия мыши;
- * если событие сработало на кнопке закрытия попапа или оверлее, вызывает функцию закрытия попапа
- */
-popups.forEach((popup) => {
-  popup.addEventListener('mousedown', (evt) => {
-    if (evt.target.classList.contains('popup_opened')) {
-      closePopup(popup)
-    }
-    if (evt.target.classList.contains('popup__btn-close')) {
-      closePopup(popup)
-    }
-  })
-})
-
+cardSection.renderItems();
 
 enableValidation(settings);
