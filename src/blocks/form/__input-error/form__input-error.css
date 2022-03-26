@@ -5,4 +5,7 @@
   font-size: 12px;
   line-height: 15px;
   color: #f00;
+  position: absolute;
+  left: 0;
+  top: 44px;
 }

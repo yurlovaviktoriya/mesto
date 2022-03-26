@@ -44,10 +44,14 @@
     <div class="popup__form-container">
       <form class="form" name="formEditProfile">
         <h2 class="form__title">Редактировать профиль</h2>
-        <input class="form__input" type="text" id="input-profile-name" name="nameProfile" required placeholder="Введите имя" minlength="2" maxlength="40">
-        <span class="form__input-error input-profile-name-error"></span>
-        <input class="form__input" type="text" id="input-profile-job" name="jobProfile" required placeholder="Расскажите про область интересов" minlength="2" maxlength="200">
-        <span class="form__input-error input-profile-job-error "></span>
+        <div class="form__input-wrapper">
+          <input class="form__input" type="text" id="input-profile-name" name="nameProfile" required placeholder="Введите имя" minlength="2" maxlength="40">
+          <span class="form__input-error input-profile-name-error"></span>
+        </div>
+        <div class="form__input-wrapper">
+          <input class="form__input" type="text" id="input-profile-job" name="jobProfile" required placeholder="Расскажите про область интересов" minlength="2" maxlength="200">
+          <span class="form__input-error input-profile-job-error "></span>
+        </div>
         <button class="form__btn" type="submit">Сохранить</button>
       </form>
       <button class="popup__btn-close" type="button" aria-label="Закрыть форму редактирования профиля"></button>
@@ -57,10 +61,14 @@
     <div class="popup__form-container">
       <form class="form" name="formAddPlace">
         <h2 class="form__title">Новое место</h2>
-        <input class="form__input" type="text" id="input-place-name" name="namePlace" required placeholder="Название" minlength="2" maxlength="30">
-        <span class="form__input-error input-place-name-error "></span>
-        <input class="form__input" type="url" id="input-place-url-img" name="urlPlaceImg" required placeholder="Ссылка на картинку">
-        <span class="form__input-error input-place-url-img-error"></span>
+        <div class="form__input-wrapper">
+          <input class="form__input" type="text" id="input-place-name" name="namePlace" required placeholder="Название" minlength="2" maxlength="30">
+          <span class="form__input-error input-place-name-error "></span>
+       </div>
+        <div class="form__input-wrapper">
+          <input class="form__input" type="url" id="input-place-url-img" name="urlPlaceImg" required placeholder="Ссылка на картинку">
+          <span class="form__input-error input-place-url-img-error"></span>
+        </div>
         <button class="form__btn form__btn_disabled" type="submit" disabled>Создать</button>
       </form>
       <button class="popup__btn-close" type="button" aria-label="Закрыть форму добавления места"></button>
