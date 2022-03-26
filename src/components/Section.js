@@ -1,12 +1,10 @@
 export default class Section {
   /**
    * Создаёт экземпляр секции для добавления в неё DOM-элементов
-   * @param {object} items - Объект с элементами, которые нужно добавить в секцию
    * @param {object} renderer - Функция вставки DOM-элементов в секцию
    * @param {string} containerSelector - Селектор секции-контейнера
    */
-  constructor({items, renderer}, containerSelector) {
-    this._items = items;
+  constructor(renderer, containerSelector) {
     this._renderer = renderer;
     this._container = document.querySelector(containerSelector);
   }
@@ -14,19 +12,21 @@ export default class Section {
 
   /**
    * Метод запускает отрисовку первоначальных данных
+   * @param {object} items - Объект с элементами, которые нужно добавить в секцию
    */
-  renderItems() {
-    this._items.forEach((item) => {
-      this._renderer(item, this._container);
-    })
+  renderItems(items) {
+    items.forEach((item) => {
+      this.addItem(item);
+    });
   }
 
 
   /**
-   * Метод добавляет запускает добавление одного DOM-элемента
+   * Метод добавляет один DOM-элемент в секцию-контейнер
    * @param {object} domElement - Элемент, который нужно добавить в секцию-контейнер
    */
   addItem(domElement) {
-    this._renderer(domElement, this._container);
+    const newCard = this._renderer(domElement);
+    this._container.prepend(newCard);
   }
 }

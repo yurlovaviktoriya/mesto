@@ -4,7 +4,8 @@ export default class Popup {
    * @param {string} popupSelector - Селектор попапа-контейнера
    */
   constructor(popupSelector) {
-    this.popup = document.querySelector(popupSelector);
+    this._popup = document.querySelector(popupSelector);
+    this._boundHandleEscClose = this._handleEscClose.bind(this);
   }
 
 
@@ -24,7 +25,7 @@ export default class Popup {
    * Метод добавляет слушатели на события, связанные с экземпляром попапа
    */
   setEventListeners() {
-    this.popup.addEventListener('mousedown', (event) => {
+    this._popup.addEventListener('mousedown', (event) => {
       if (event.target.classList.contains('popup_opened')) {
         this.close();
       }
@@ -32,7 +33,6 @@ export default class Popup {
         this.close();
       }
     });
-    document.addEventListener('keydown', event => {this._handleEscClose(event)});
   }
 
 
@@ -40,7 +40,8 @@ export default class Popup {
    * Метод открывает экземпляр попапа
    */
   open() {
-    this.popup.classList.add('popup_opened');
+    this._popup.classList.add('popup_opened');
+    document.addEventListener('keydown', this._boundHandleEscClose);
   }
 
 
@@ -48,6 +49,7 @@ export default class Popup {
    * Метод закрывает экземпляр попапа
    */
   close() {
-    this.popup.classList.remove('popup_opened')
+    this._popup.classList.remove('popup_opened');
+    document.removeEventListener('keydown', this._boundHandleEscClose);
   }
 }

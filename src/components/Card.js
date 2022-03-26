@@ -39,6 +39,7 @@ export default class Card {
    */
   _deletePlace = () => {
     this._cardElement.remove();
+    this._cardElement = null;
   }
 
 

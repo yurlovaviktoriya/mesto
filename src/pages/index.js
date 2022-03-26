@@ -6,16 +6,20 @@ import Card from '../components/Card.js';
 import PopupWithForm from '../components/PopupWithForm.js';
 import PopupWithImage from '../components/PopupWithImage.js';
 import FormValidator from '../components/FormValidator.js';
-import {initialCards} from '../components/initialData.js';
+import {initialCards} from '../utils/initialData.js';
 
 
 const buttonProfileEdit = document.querySelector('.profile__edit-btn');
 const buttonPlaceAdd = document.querySelector('.profile__add-btn');
+
 const userInfo = new UserInfo({nameSelector: '.profile__title', jobSelector: '.profile__subtitle'});
-const cardSection = new Section({items: initialCards, renderer: renderCard}, '.places');
+const cardSection = new Section(renderCard, '.places');
 const popupEditProfile = new PopupWithForm('.popup_type_edit-profile', handleFormEditProfile);
 const popupAddPlace = new PopupWithForm('.popup_type_add-place', handleFormAddPlace);
 const popupViewPlace = new PopupWithImage('.popup_type_view-place');
+
+const inputProfileName = popupEditProfile._popup.querySelector('#input-profile-name');
+const inputProfileJob = popupEditProfile._popup.querySelector('#input-profile-job');
 
 const settings = {
   formSelector: '.form',
@@ -62,18 +66,17 @@ function handleCardClick(name, link) {
  * @returns {*} - Экземпляр карточки места
  */
 function createCard(placeItem) {
-  return new Card(placeItem, '.template__place-card', handleCardClick);
+  const card = new Card(placeItem, '.template__place-card', handleCardClick);
+  return card.generateCard();
 }
 
 
 /**
  * Функция создаёт экземпляры класса Card и добавляет карточки места на страницу
  * @param {object} placeItem - Объект с названием места и ссылкой на изображение
- * @param {object} container - DOM-элемент, в который добавляются карточки места
  */
-function renderCard(placeItem, container) {
-  const card = createCard(placeItem);
-  container.prepend(card.generateCard());
+function renderCard(placeItem) {
+  return createCard(placeItem);
 }
 
 
@@ -87,8 +90,8 @@ function openFormEditProfile() {
   formValidators[formEditProfile.getAttribute('name')].resetValidation();
 
   const {name, job} = userInfo.getUserInfo();
-  popupEditProfile.popup.querySelector('#input-profile-name').value = name;
-  popupEditProfile.popup.querySelector('#input-profile-job').value = job;
+  inputProfileName.value = name;
+  inputProfileJob.value = job;
 
   popupEditProfile.open();
 }
@@ -136,6 +139,6 @@ popupAddPlace.setEventListeners();
 popupEditProfile.setEventListeners();
 popupViewPlace.setEventListeners();
 
-cardSection.renderItems();
+cardSection.renderItems(initialCards);
 
 enableValidation(settings);

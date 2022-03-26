@@ -2,6 +2,16 @@ import Popup from './Popup.js';
 
 
 export default class PopupWithImage extends Popup {
+  /**
+   * Создаёт экземпляр попапа с формой
+   * @param {string} popupSelector - Селектор экземпляра попапа
+   */
+  constructor(popupSelector) {
+      super(popupSelector);
+      this._imgUri = this._popup.querySelector('.popup__place-img');
+      this._titleImg = this._popup.querySelector('.popup__place-title');
+    }
+
 
   /**
    * Метод открывает экземпляр попапа и заполняет его актуальными данными
@@ -9,13 +19,10 @@ export default class PopupWithImage extends Popup {
    * @param {string} link - Ссылка на изображение места
    */
   open({name, link}) {
-    const imgUri = this.popup.querySelector('.popup__place-img');
-    const titleImg = this.popup.querySelector('.popup__place-title');
+    super.open();
 
-    imgUri.src = link;
-    imgUri.alt = `Изображение места ${name}`;
-    titleImg.textContent = name;
-
-    this.popup.classList.add('popup_opened');
+    this._imgUri.src = link;
+    this._imgUri.alt = `Изображение места ${name}`;
+    this._titleImg.textContent = name;
   }
 }
