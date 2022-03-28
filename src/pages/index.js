@@ -11,15 +11,14 @@ import {initialCards} from '../utils/initialData.js';
 
 const buttonProfileEdit = document.querySelector('.profile__edit-btn');
 const buttonPlaceAdd = document.querySelector('.profile__add-btn');
+const inputProfileName = document.querySelector('#input-profile-name');
+const inputProfileJob = document.querySelector('#input-profile-job');
 
 const userInfo = new UserInfo({nameSelector: '.profile__title', jobSelector: '.profile__subtitle'});
 const cardSection = new Section(renderCard, '.places');
 const popupEditProfile = new PopupWithForm('.popup_type_edit-profile', handleFormEditProfile);
 const popupAddPlace = new PopupWithForm('.popup_type_add-place', handleFormAddPlace);
 const popupViewPlace = new PopupWithImage('.popup_type_view-place');
-
-const inputProfileName = popupEditProfile._popup.querySelector('#input-profile-name');
-const inputProfileJob = popupEditProfile._popup.querySelector('#input-profile-job');
 
 const settings = {
   formSelector: '.form',
