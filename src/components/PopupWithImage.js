@@ -19,10 +19,10 @@ export default class PopupWithImage extends Popup {
    * @param {string} link - Ссылка на изображение места
    */
   open({name, link}) {
-    super.open();
-
     this._imgUri.src = link;
     this._imgUri.alt = `Изображение места ${name}`;
     this._titleImg.textContent = name;
+
+    super.open();
   }
 }

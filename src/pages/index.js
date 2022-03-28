@@ -72,11 +72,11 @@ function createCard(placeItem) {
 
 
 /**
- * Функция создаёт экземпляры класса Card и добавляет карточки места на страницу
+ * Функция вызывает метод экземпляра класса Card, чтобы добавить карточку места на страницу
  * @param {object} placeItem - Объект с названием места и ссылкой на изображение
  */
 function renderCard(placeItem) {
-  return createCard(placeItem);
+  cardSection.addItem(createCard(placeItem));
 }
 
 
@@ -126,7 +126,7 @@ function openFormAddPlace() {
  */
 function handleFormAddPlace(inputValues) {
   const place = {name: inputValues['namePlace'], link: inputValues['urlPlaceImg']};
-  cardSection.addItem(place);
+  cardSection.addItem(createCard(place));
 
   popupAddPlace.close();
 }

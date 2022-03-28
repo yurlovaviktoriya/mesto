@@ -16,17 +16,16 @@ export default class Section {
    */
   renderItems(items) {
     items.forEach((item) => {
-      this.addItem(item);
+      this._renderer(item);
     });
   }
 
 
   /**
-   * Метод добавляет один DOM-элемент в секцию-контейнер
+   * Метод добавляет DOM-элемент в секцию-контейнер
    * @param {object} domElement - Элемент, который нужно добавить в секцию-контейнер
    */
   addItem(domElement) {
-    const newCard = this._renderer(domElement);
-    this._container.prepend(newCard);
+    this._container.prepend(domElement);
   }
 }
