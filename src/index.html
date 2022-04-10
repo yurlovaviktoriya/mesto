@@ -14,11 +14,12 @@
     </header>
     <main class="content">
       <section class="profile page__profile">
-        <img class="profile__avatar" src=<%=require("./images/avatar.jpg")%> alt="Аватар пользователя">
+        <div class="profile__avatar-overlay"></div>
+        <img class="profile__avatar" src="" alt="Аватар пользователя">
         <div class="profile__info">
-          <h1 class="profile__title">Жак-Ив Кусто</h1>
+          <h1 class="profile__title"></h1>
           <button class="profile__edit-btn button" type="button" aria-label="Редактировать профиль"></button>
-          <p class="profile__subtitle">Исследователь океана</p>
+          <p class="profile__subtitle"></p>
         </div>
         <button class="profile__add-btn button" type="button" aria-label="Добавить новое место"></button>
       </section>
@@ -27,10 +28,9 @@
         <template class="template template__place-card">
           <article class="card">
             <img class="card__img" src="#" alt="Изображение места">
-            <div class="card__info">
-              <h2 class="card__title"></h2>
-              <button class="card__btn-like" type="button" aria-label="Поставить лайк"></button>
-            </div>
+            <h2 class="card__title"></h2>
+            <button class="card__btn-like" type="button" aria-label="Поставить лайк"></button>
+            <p class="card__counter-like"></p>
             <button class="card__btn-del" type="button" aria-label="Удалить карточку с местом"></button>
           </article>
         </template>
@@ -57,6 +57,19 @@
       <button class="popup__btn-close" type="button" aria-label="Закрыть форму редактирования профиля"></button>
     </div>
   </div>
+  <div class="popup popup_type_update-avatar">
+    <div class="popup__form-container">
+      <form class="form" name="formUpdateAvatar">
+        <h2 class="form__title">Обновить аватар</h2>
+        <div class="form__input-wrapper">
+         <input class="form__input" type="url" id="input-avatar-url" name="urlAvatar" required placeholder="Ссылка на аватар">
+         <span class="form__input-error input-avatar-url-error"></span>
+        </div>
+        <button class="form__btn" type="submit">Сохранить</button>
+      </form>
+      <button class="popup__btn-close" type="button" aria-label="Закрыть форму редактирования профиля"></button>
+    </div>
+  </div>
   <div class="popup popup_type_add-place">
     <div class="popup__form-container">
       <form class="form" name="formAddPlace">
@@ -69,7 +82,7 @@
           <input class="form__input" type="url" id="input-place-url-img" name="urlPlaceImg" required placeholder="Ссылка на картинку">
           <span class="form__input-error input-place-url-img-error"></span>
         </div>
-        <button class="form__btn form__btn_disabled" type="submit" disabled>Создать</button>
+        <button class="form__btn" type="submit" disabled>Создать</button>
       </form>
       <button class="popup__btn-close" type="button" aria-label="Закрыть форму добавления места"></button>
     </div>
@@ -79,6 +92,13 @@
       <img class="popup__place-img" src="#" alt="">
       <h3 class="popup__place-title"></h3>
       <button class="popup__btn-close" type="button" aria-label="Закрыть изображение места"></button>
+    </div>
+  </div>
+  <div class="popup popup_type_confirm-delete">
+    <div class="popup__confirm-delete">
+     <h2 class="popup__title">Вы уверены?</h2>
+     <button class="popup__btn-confirm" type="submit">Да</button>
+     <button class="popup__btn-close" type="button" aria-label="Закрыть окно подтверждения удаления карточки"></button>
     </div>
   </div>
 </body>
