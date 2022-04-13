@@ -205,7 +205,6 @@ function handleFormUpdateAvatar(inputValues) {
   return api.updateAvatar({avatar: inputValues['urlAvatar']})
     .then(res => {
       userInfo.setUserInfo(res);
-      profileAvatar.src = res.avatar;
     })
     .catch(err => {
       console.log(err);
