@@ -6,22 +6,51 @@ export default class PopupWithConfirmation extends Popup {
    * @param {string} popupSelector - Селектор экземпляра попапа
    * @param {object} handleConfirm - Функция-обработчик 'submit'
    */
-  constructor(popupSelector, elementId, element, handleConfirm) {
+  constructor(popupSelector, handleConfirm) {
     super(popupSelector);
-    this._handleConfirm = handleConfirm;
-    this._elementId = elementId;
-    this._element = element;
     this._confirmButton = this._popup.querySelector('.popup__btn-confirm');
+    this._handleConfirm = handleConfirm;
+    this._cardId = null;
+    this._cardElement = null;
   }
 
 
   /**
-   * Метод добавляет слушатели на события, связанные с экземпляром попапа с согласием на удаление карточки
+   * Метод добавляет слушатели на события, связанные с экземпляром попапа
    */
   setEventListeners() {
     super.setEventListeners();
-    this._confirmButton.addEventListener('click', (event) => {
-      this._handleConfirm(this, this._elementId, this._element);
+    this._confirmButton.addEventListener('click', () => {
+      this._handleConfirm(this._cardId)
+        .then(() => {
+          this._cardElement.remove();
+          this.close();
+        })
+        .catch(err => {
+            console.log(err);
+        });
     });
+  }
+
+
+  /**
+   * Метод связывает данные карточки с попапом
+   * @param cardId
+   * @param cardElement
+   */
+  updateCardInfo({ cardId, cardElement }) {
+    this._cardId = cardId;
+    this._cardElement = cardElement;
+  }
+
+
+  /**
+   * Метод закрывает попап;
+   * отвязывает попап от какой-либо карточки
+   */
+  close() {
+    super.close();
+    this._cardId = null;
+    this._cardElement = null;
   }
 }

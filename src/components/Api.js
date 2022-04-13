@@ -9,12 +9,26 @@ class Api {
 
 
   /**
+   * Метод проверяет ответ от сервера
+   * @param {Promise} res - Ответ от сервера
+   * @returns {Promise}
+   * @private
+   */
+  _checkResponse(res) {
+    if (res.ok) {
+      return res.json();
+    }
+    return Promise.reject(`Ошибка: ${res.status}`);
+  }
+
+
+  /**
    * Метод, осуществляющий GET-запрос на сервер, чтобы получить данные для отрисовки карточек места
    * @returns {Promise} - Данные о местах, добавленных пользователями, или ошибка
    */
   getInitialCards() {
     return fetch(`${this._options.baseUrl}/cards`, {headers: this._options.headers})
-      .then(res => res.ok ? res.json() : Promise.reject(`Ошибка: ${res.status}`))
+      .then(this._checkResponse)
   }
 
 
@@ -24,7 +38,7 @@ class Api {
    */
   getProfileInfo() {
     return fetch(`${this._options.baseUrl}/users/me `, {headers: this._options.headers})
-      .then(res => res.ok ? res.json() : Promise.reject(`Ошибка: ${res.status}`))
+      .then(this._checkResponse)
   }
 
 
@@ -45,7 +59,7 @@ class Api {
         })
       }
     )
-      .then(res => res.ok ? res.json() : Promise.reject(`Ошибка: ${res.status}`))
+      .then(this._checkResponse)
   }
 
 
@@ -64,7 +78,7 @@ class Api {
         })
       }
     )
-      .then(res => res.ok ? res.json() : Promise.reject(`Ошибка: ${res.status}`))
+      .then(this._checkResponse)
   }
 
 
@@ -85,7 +99,7 @@ class Api {
         })
       }
     )
-      .then(res => res.ok ? res.json() : Promise.reject(`Ошибка: ${res.status}`))
+      .then(this._checkResponse)
   }
 
 
@@ -101,7 +115,7 @@ class Api {
         headers: this._options.headers
       }
     )
-      .then(res => res.ok ? res.json() : Promise.reject(`Ошибка: ${res.status}`))
+      .then(this._checkResponse)
   }
 
 
@@ -111,8 +125,12 @@ class Api {
    * @returns {Promise} - Обновлённые данные по лайкам карточки или ошибка
    */
   likeCard(cardId) {
-    return fetch(`${this._options.baseUrl}/cards/${cardId}/likes`, {method: 'PUT', headers: this._options.headers})
-      .then(res => res.ok ? res.json() : Promise.reject(`Ошибка: ${res.status}`))
+    return fetch(`${this._options.baseUrl}/cards/${cardId}/likes`,
+      {
+        method: 'PUT',
+        headers: this._options.headers
+      })
+      .then(this._checkResponse)
   }
 
 
@@ -122,8 +140,12 @@ class Api {
    * @returns {Promise} - Обновлённые данные по лайкам карточки или ошибка
    */
   removeLikeCard(cardId) {
-    return fetch(`${this._options.baseUrl}/cards/${cardId}/likes`, {method: 'DELETE', headers: this._options.headers})
-      .then(res => res.ok ? res.json() : Promise.reject(`Ошибка: ${res.status}`))
+    return fetch(`${this._options.baseUrl}/cards/${cardId}/likes`,
+      {
+        method: 'DELETE',
+        headers: this._options.headers
+      })
+      .then(this._checkResponse)
   }
 }
 

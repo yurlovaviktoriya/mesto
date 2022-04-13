@@ -1,5 +1,14 @@
 import './index.css';
 
+import {
+  buttonProfileEdit,
+  buttonUpdateAvatar,
+  buttonPlaceAdd,
+  profileAvatar,
+  settings,
+  formValidators
+} from '../utils/constans.js';
+
 import UserInfo from '../components/UserInfo.js';
 import Section from '../components/Section.js';
 import Card from '../components/Card.js';
@@ -9,11 +18,6 @@ import PopupWithConfirmation from '../components/PopupWithConfirmation.js';
 import FormValidator from '../components/FormValidator.js';
 import { api } from '../components/Api';
 
-const buttonProfileEdit = document.querySelector('.profile__edit-btn');
-const buttonUpdateAvatar = document.querySelector('.profile__avatar-overlay');
-const buttonPlaceAdd = document.querySelector('.profile__add-btn');
-const inputProfileName = document.querySelector('#input-profile-name');
-const inputProfileJob = document.querySelector('#input-profile-job');
 
 const userInfo = new UserInfo({
   nameSelector: '.profile__title',
@@ -25,18 +29,7 @@ const popupEditProfile = new PopupWithForm('.popup_type_edit-profile', handleFor
 const popupUpdateAvatar = new PopupWithForm('.popup_type_update-avatar', handleFormUpdateAvatar);
 const popupAddPlace = new PopupWithForm('.popup_type_add-place', handleFormAddPlace);
 const popupViewPlace = new PopupWithImage('.popup_type_view-place');
-
-
-const settings = {
-  formSelector: '.form',
-  inputSelector: '.form__input',
-  submitButtonSelector: '.form__btn',
-  inactiveButtonClass: 'form__btn_disabled',
-  inputErrorClass: 'form__input_type_error',
-  errorClass: 'form__error_visible'
-}
-
-const formValidators = {};
+const popupConfirmDelete = new PopupWithConfirmation('.popup_type_confirm-delete', handleCardDelete);
 
 
 /**
@@ -59,13 +52,7 @@ const enableValidation = (settings) => {
  * Функция делает запрос к API, чтобы получить с сервера данные о текущем пользователе
  */
 function getProfileInfo() {
-  api.getProfileInfo()
-  .then(res => {
-    userInfo.setUserInfo(res);
-  })
-  .catch(err => {
-    console.log(err);
-  });
+  return api.getProfileInfo();
 }
 
 
@@ -73,142 +60,91 @@ function getProfileInfo() {
  * Функция делает запрос к API, чтобы получить с сервера данные о местах
  */
 function getInitialCards() {
-  api.getInitialCards()
-  .then(res => {
-    cardSection.renderItems(res);
+  return api.getInitialCards();
+}
+
+
+/**
+ * Промис объединяет два запроса к API (данные о пользователе, данные о местах);
+ * при успешном ответе сервера запускает отрисовку данных на странице
+ */
+Promise.all([getProfileInfo(), getInitialCards()])
+  .then(([profileInfo, initialCards]) => {
+    userInfo.setUserInfo(profileInfo);
+    cardSection.renderItems(initialCards);
   })
   .catch(err => {
     console.log(err);
   });
-}
 
 
 /**
- * Функция обрабатывает 'click' по изображению карточки места
+ * Функция обрабатывает 'click' по изображению карточки места;
+ * открывает попап с изображением
  * @param {string} name - Название места
  * @param {string} link - Ссылка на изображение места
  */
 function handleCardClick(name, link) {
-  popupViewPlace.open({name: name, link: link});
+  popupViewPlace.open({name, link});
 }
 
 
 /**
- * Функция создаёт попап для подтверждения удаления карточки места и открывает его
+ * Функция открывает попап для подтверждения удаления карточки места;
+ * привязывает данные карточки к этому попапу
  * @param {string} cardId - Идентификатор записи о месте
  * @param {object} cardElement - Карточка, к которой привязан попап согласия на удаление
  */
-function createPopupConfirmDelete(cardId, cardElement) {
-  const popupConfirmDelete = new PopupWithConfirmation(
-    '.popup_type_confirm-delete',
-    cardId,
-    cardElement,
-    handleCardDelete
-  );
-  popupConfirmDelete.setEventListeners();
+function openPopupConfirmDelete(cardId, cardElement) {
+  popupConfirmDelete.updateCardInfo({cardId, cardElement});
 
   popupConfirmDelete.open();
 }
 
 
 /**
- * Функция обрабатывает 'click' с согласием на удаление карточки места
- * @param {object} popup - Попап согласия на удаление карточки места
+ * Функция делает запрос к API, чтобы удалить данные о месте из БД на сервере
  * @param {string} cardId - Идентификатор записи о месте
- * @param {object} cardElement - Карточка, к которой привязан попап согласия на удаление
  */
-function handleCardDelete(popup, cardId, cardElement) {
-  api.deleteCard(cardId)
-    .catch(err => {
-      console.log(err);
-    });
-
-  popup.close();
-  popup = null;
-
-  cardElement.remove();
-  cardElement = null;
+function handleCardDelete(cardId) {
+  return api.deleteCard(cardId);
 }
 
 
 /**
- * Функция обрабатывает 'click' для постановки лайка карточке места
- * @param {string} cardId - Идентификатор записи о месте
- * @param {object} counterLike - Элемент DOM-дерева с отображением количества лайкнувших
+ * Функция делает запрос к API, чтобы обновить данные в БД на сервере (поставить лайк карточке места)
+ * @param {object} cardId - Идентификатор записи о месте
  */
-function handleCardLike(cardId, counterLike) {
-  api.likeCard(cardId)
-    .then(res => {
-      counterLike.textContent = res.likes.length;
-    })
-    .catch(err => {
-      console.log(err);
-    })
+function handleCardLike(cardId) {
+  return api.likeCard(cardId);
 }
 
 
 /**
- * Функция обрабатывает 'click' для удаления лайка карточке места
+ * Функция делает запрос к API, чтобы обновить данные в БД на сервере (удалить лайк у карточки места)
  * @param {string} cardId - Идентификатор записи о месте
- * @param {object} counterLike - Элемент DOM-дерева с отображением количества лайкнувших
  */
-function handleRemoveCardLike(cardId, counterLike) {
-  api.removeLikeCard(cardId)
-    .then(res => {
-      if (res.likes.length === 0) {
-        counterLike.textContent = '';
-      } else {
-        counterLike.textContent = res.likes.length;
-      }
-    })
-    .catch(err => {
-      console.log(err);
-    })
+function handleRemoveCardLike(cardId) {
+  return api.removeLikeCard(cardId);
 }
 
 
 /**
- * Функция создаёт экземпляр карточки места
+ * Функция создаёт экземпляр карточки места и генерирует элемент карточки для DOM-дерева
  * @param {object} placeItem - Объект с названием места и ссылкой на изображение
  * @returns {*} - Экземпляр карточки места
  */
-function createCard(placeItem) {
+function renderCard(placeItem) {
   const card = new Card(
     placeItem,
     '.template__place-card',
     handleCardClick,
-    createPopupConfirmDelete,
+    openPopupConfirmDelete,
     handleCardLike,
     handleRemoveCardLike
   );
 
   return card.generateCard(userInfo.getUserInfo().id);
-}
-
-
-/**
- * Функция вызывает метод экземпляра класса Card, чтобы добавить карточку места на страницу
- * @param {object} placeItem - Объект с названием места и ссылкой на изображение
- */
-function renderCard(placeItem) {
-  cardSection.addItem(createCard(placeItem));
-}
-
-
-/**
- * Функция деактивирует кнопку при отправке данных на сервер и меняет текст на ней
- * @param {object} popup - Попап с формой отправки данных
- * @param {boolean} isLoading - Информация об отправке данных на сервер
- */
-function disableButton(popup, isLoading) {
-  const btn = popup.querySelector('.form__btn')
-  if (isLoading) {
-    btn.disabled = 'disabled';
-    btn.textContent = 'Сохранение...';
-  } else {
-    btn.textContent = 'Сохранить';
-  }
-
 }
 
 
@@ -221,33 +157,26 @@ function disableButton(popup, isLoading) {
 function openFormEditProfile() {
   formValidators[formEditProfile.getAttribute('name')].resetValidation();
 
-  const {name, job} = userInfo.getUserInfo();
-  inputProfileName.value = name;
-  inputProfileJob.value = job;
+  const { name, job } = userInfo.getUserInfo();
+  popupEditProfile.setInputValues({nameProfile: name, jobProfile: job});
 
   popupEditProfile.open();
 }
 
 
 /**
- * Функция обрабатывает 'submit' формы редактирования профиля
- * @param {object} popup - Попап с формой отправки данных
+ * Функция обрабатывает 'submit' формы редактирования профиля;
+ * делает запрос к API, чтобы обновить данные в БД на сервере (имя пользователя и род занятий)
  * @param {object} inputValues - Объект с данными из инпутов
  */
-function handleFormEditProfile(popup, inputValues) {
-  disableButton(popup, true);
-
-  api.editProfileInfo({name: inputValues['nameProfile'], job: inputValues['jobProfile']})
+function handleFormEditProfile(inputValues) {
+  return api.editProfileInfo({name: inputValues['nameProfile'], job: inputValues['jobProfile']})
     .then(res => {
       userInfo.setUserInfo(res);
     })
     .catch(err => {
       console.log(err);
-    });
-
-  disableButton(popup, false);
-
-  popupEditProfile.close();
+    })
 }
 
 
@@ -260,26 +189,27 @@ function handleFormEditProfile(popup, inputValues) {
 function openPopupUpdateAvatar() {
   formValidators[formUpdateAvatar.getAttribute('name')].resetValidation();
 
+  const { avatar } = userInfo.getUserInfo();
+  popupUpdateAvatar.setInputValues({urlAvatar: avatar});
+
   popupUpdateAvatar.open();
 }
 
 
 /**
- * Функция обрабатывает 'submit' формы редактирования аватара
- * @param {object} popup - Попап с формой отправки данных
+ * Функция обрабатывает 'submit' формы редактирования аватара;
+ * делает запрос к API, чтобы обновить данные в БД на сервере (аватар пользователя)
  * @param {object} inputValues - Объект с данными из инпута
  */
-function handleFormUpdateAvatar(popup, inputValues) {
-  disableButton(popup);
-  api.updateAvatar({avatar: inputValues['urlAvatar']})
+function handleFormUpdateAvatar(inputValues) {
+  return api.updateAvatar({avatar: inputValues['urlAvatar']})
     .then(res => {
-      document.querySelector('.profile__avatar').src = res.avatar;
+      userInfo.setUserInfo(res);
+      profileAvatar.src = res.avatar;
     })
     .catch(err => {
       console.log(err);
-    });
-
-  popupUpdateAvatar.close()
+    })
 }
 
 
@@ -296,23 +226,20 @@ function openFormAddPlace() {
 
 
 /**
- * Функция обрабатывает 'submit' формы добавления нового места
- * @param {object} popup - Попап с формой отправки данных
+ * Функция обрабатывает 'submit' формы добавления нового места;
+ * делает запрос к API, чтобы обновить данные в БД на сервере (добавить новое место)
  * @param {object} inputValues - Объект с данными из инпутов
  */
-function handleFormAddPlace(popup, inputValues) {
+function handleFormAddPlace(inputValues) {
   const place = {name: inputValues['namePlace'], link: inputValues['urlPlaceImg']};
-  disableButton(popup);
 
-  api.addCard(place)
+  return api.addCard(place)
     .then(res => {
-      cardSection.addItem(createCard(res));
+      cardSection.addItem(res);
     })
     .catch(err => {
         console.log(err);
-      });
-
-  popupAddPlace.close();
+    });
 }
 
 
@@ -324,7 +251,6 @@ popupAddPlace.setEventListeners();
 popupEditProfile.setEventListeners();
 popupViewPlace.setEventListeners();
 popupUpdateAvatar.setEventListeners();
+popupConfirmDelete.setEventListeners();
 
 enableValidation(settings);
-getProfileInfo();
-getInitialCards();

@@ -4,8 +4,11 @@ export default class Card {
    * @param {object} data - Объект с наименованием места и ссылкой на его изображение
    * @param {object} templateSelector - Селектор html-шаблона для карточки места
    * @param {object} handleCardClick - Функция, обрабатывающая клик по изображению на карточке места
+   * @param {object} openPopupConfirmDelete - Функция, обрабатывающая клик по кнопке удаления карточки
+   * @param {object} handleCardLike - Функция, обрабатывающая постановку лайка на карточке места
+   * @param {object} handleRemoveCardLike - Функция, обрабатывающая удаление лайка на карточке места
    */
-  constructor(data, templateSelector, handleCardClick, createPopupCardDelete, handleCardLike, handleRemoveCardLike) {
+  constructor(data, templateSelector, handleCardClick, openPopupConfirmDelete, handleCardLike, handleRemoveCardLike) {
     this._id = data._id;
     this._owner = data.owner._id;
     this._placeTitle = data.name;
@@ -14,7 +17,7 @@ export default class Card {
     this._numLike = data.likes.length;
     this._templateSelector = templateSelector;
     this._handleCardClick = handleCardClick;
-    this._createPopupCardDelete = createPopupCardDelete;
+    this._openPopupConfirmDelete = openPopupConfirmDelete;
     this._handleCardLike = handleCardLike;
     this._handleRemoveCardLike = handleRemoveCardLike;
   }
@@ -35,25 +38,49 @@ export default class Card {
 
 
   /**
-   * Метод запускает процесс добавления или снятия лайка у карточки места
-   * @private
-   */
-  _likePlace = () => {
-    if (this._likeButton.classList.contains('card__btn-like_active')) {
-      this._handleRemoveCardLike(this._id, this._counterLike);
-    } else {
-      this._handleCardLike(this._id, this._counterLike);
-    }
-    this._likeButton.classList.toggle('card__btn-like_active');
-  }
-
-
-  /**
    * Метод запускает процесс удаления карточки места
    * @private
    */
   _deletePlace = () => {
-    this._createPopupCardDelete(this._id, this._cardElement);
+    this._openPopupConfirmDelete(this._id, this._cardElement);
+  }
+
+
+  /**
+   * Метод обрабатывает 'click' по кнопке лайка при его добавлении
+   * @private
+   */
+  _addLike() {
+    this._handleCardLike(this._id)
+      .then((res) => {
+      this._counterLike.textContent = res.likes.length;
+      this._likeButton.classList.add('card__btn-like_active');
+      this._userLikedCard = true;
+      })
+      .catch(err => {
+        console.log(err);
+      });
+  }
+
+
+   /**
+   * Метод обрабатывает 'click' по кнопке лайка при его удалении
+   * @private
+   */
+  _removeLike() {
+    this._handleRemoveCardLike(this._id)
+      .then(res => {
+        if (res.likes.length === 0) {
+          this._counterLike.textContent = '';
+        } else {
+          this._counterLike.textContent = res.likes.length;
+        }
+        this._likeButton.classList.remove('card__btn-like_active');
+        this._userLikedCard = false;
+      })
+      .catch(err => {
+        console.log(err);
+      })
   }
 
 
@@ -65,7 +92,15 @@ export default class Card {
     this._cardImg.addEventListener('click', () => {
       this._handleCardClick(this._placeTitle, this._imgUri);
     });
-    this._likeButton.addEventListener('click', this._likePlace);
+
+    this._likeButton.addEventListener('click', () => {
+      if (this._userLikedCard) {
+        this._removeLike();
+      } else {
+        this._addLike();
+      }
+    });
+
     if (this._userIsCardOwner) {
       this._deleteButton.addEventListener('click', this._deletePlace);
     }
@@ -93,7 +128,7 @@ export default class Card {
    * @returns {boolean}
    * @private
    */
-  _checkUserLikesCard(userId) {
+  _checkUserLikedCard(userId) {
     return this._likes.some(function(item) {
       return item._id === userId;
     });
@@ -113,8 +148,6 @@ export default class Card {
     this._deleteButton = this._cardElement.querySelector('.card__btn-del');
     this._counterLike = this._cardElement.querySelector('.card__counter-like');
 
-    this._addCardListeners();
-
     this._cardElement.querySelector('.card__title').textContent = this._placeTitle;
     this._cardImg.src = this._imgUri;
     this._cardImg.alt = `Изображение места ${this._placeTitle}`;
@@ -123,11 +156,14 @@ export default class Card {
       this._counterLike.textContent = this._numLike;
     }
 
-    const userLikeCard = this._checkUserLikesCard(userId);
-    if (userLikeCard) {
+    this._userLikedCard = this._checkUserLikedCard(userId);
+    if (this._userLikedCard) {
       this._likeButton.classList.add('card__btn-like_active');
     }
 
+    this._addCardListeners();
+
     return this._cardElement;
   }
+
 }

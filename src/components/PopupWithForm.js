@@ -11,6 +11,8 @@ export default class PopupWithForm extends Popup {
     super(popupSelector);
     this._handleForm = handleForm;
     this._form = this._popup.querySelector('.form');
+    this._inputList = this._form.querySelectorAll('.form__input');
+    this._submitButton = this._form.querySelector('.form__btn');
   }
 
 
@@ -21,7 +23,6 @@ export default class PopupWithForm extends Popup {
    */
   _getInputValues() {
     this._inputValues = {};
-    this._inputList = this._form.querySelectorAll('.form__input');
     this._inputList.forEach(inputElement => {
       this._inputValues[inputElement.name] = inputElement.value;
     });
@@ -30,14 +31,32 @@ export default class PopupWithForm extends Popup {
 
 
   /**
+   * Метод заполняет актуальными данными инпуты при открытии формы
+   * @param {objects} data - Объект с актуальными данными в зависимости от экземпляра формы
+   */
+  setInputValues(data) {
+    this._inputList.forEach((input) => {
+      input.value = data[input.name];
+    })
+  }
+
+
+  /**
    * Метод добавляет слушатели на события, связанные с экземпляром попапа с формой
    */
   setEventListeners() {
     super.setEventListeners();
+
     this._form.addEventListener('submit', (event) => {
       event.preventDefault();
-      this._handleForm(this._popup, this._getInputValues());
-    });
+      const initialText = this._submitButton.textContent;
+      this._submitButton.textContent = 'Сохранение...';
+      this._handleForm(this._getInputValues())
+        .then(() => this.close())
+        .finally(() => {
+          this._submitButton.textContent = initialText;
+        })
+    })
   }
 
 
