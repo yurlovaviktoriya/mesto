@@ -4,7 +4,6 @@ import {
   buttonProfileEdit,
   buttonUpdateAvatar,
   buttonPlaceAdd,
-  profileAvatar,
   settings,
   formValidators
 } from '../utils/constans.js';
